@@ -16,8 +16,6 @@ defmodule LiveRSSWeb.Router do
 
   scope "/", LiveRSSWeb do
     pipe_through :browser
-
-    get "/", PageController, :home
   end
 
   # Other scopes may use custom stacks.
