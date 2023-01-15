@@ -16,6 +16,8 @@ defmodule LiveRSSWeb.Router do
 
   scope "/", LiveRSSWeb do
     pipe_through :browser
+
+    live "/", Feeds
   end
 
   # Other scopes may use custom stacks.
