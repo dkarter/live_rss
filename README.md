@@ -15,7 +15,7 @@ To start your Phoenix server:
 First build an image:
 
 ```bash
-
+docker build -f Dockerfile . -t live_rss
 ```
 
 Then create a local database file:
