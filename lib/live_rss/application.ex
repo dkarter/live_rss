@@ -15,9 +15,13 @@ defmodule LiveRSS.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: LiveRSS.PubSub},
       # Start the Endpoint (http/https)
-      LiveRSSWeb.Endpoint
-      # Start a worker by calling: LiveRSS.Worker.start_link(arg)
-      # {LiveRSS.Worker, arg}
+      LiveRSSWeb.Endpoint,
+
+      # keeps track of all running feed monitor processes
+      {Registry, keys: :unique, name: LiveRSS.FeedMonitorRegistry},
+
+      # DynamicSupervisor in charge of managing feed monitors
+      LiveRSS.FeedMonitorSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

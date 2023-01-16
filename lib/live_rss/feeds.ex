@@ -11,11 +11,17 @@ defmodule LiveRSS.Feeds do
     |> Repo.insert()
   end
 
-  @spec delete_feed(binary() | number()) :: {:ok, Feed.t()} | {:error, Changeset.t()}
+  @spec delete_feed(number() | binary()) :: {:ok, Feed.t()} | {:error, Changeset.t()}
   def delete_feed(id) do
+    id
+    |> get_feed()
+    |> Repo.delete()
+  end
+
+  @spec get_feed(number() | binary()) :: Feed.t() | nil
+  def get_feed(id) do
     Feed
     |> Repo.get(id)
-    |> Repo.delete()
   end
 
   @spec list_feeds() :: [Feed.t()]
