@@ -107,7 +107,9 @@ defmodule LiveRSSWeb.Feeds do
         <:col :let={feed} label="name"><%= feed.name %></:col>
         <:col :let={feed} label="url"><%= feed.url %></:col>
         <:col :let={feed} label="actions">
-          <.button value={feed.id} phx-click="delete">Delete</.button>
+          <.button value={feed.id} phx-click="delete" alt="delete feed" class="bg-transparent">
+            <Heroicons.trash mini class="mt-0.5 h-5 w-5 flex-none fill-rose-500" />
+          </.button>
         </:col>
       </.table>
     </div>
