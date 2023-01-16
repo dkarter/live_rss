@@ -1,6 +1,9 @@
 defmodule LiveRSSWeb.Feeds do
   use LiveRSSWeb, :live_view
 
+  alias LiveRSS.Feeds
+  alias LiveRSS.Feeds.Feed
+
   def mount(_params, _session, socket) do
     changeset = new_feed_changeset()
     feeds = load_feeds()
@@ -15,8 +18,7 @@ defmodule LiveRSSWeb.Feeds do
 
   def handle_event("save", %{"feed" => feed}, socket) do
     feed
-    |> LiveRSS.Feed.changeset()
-    |> LiveRSS.Repo.insert()
+    |> Feeds.create_feed()
     |> case do
       {:ok, _feed} ->
         feeds = load_feeds()
@@ -42,8 +44,8 @@ defmodule LiveRSSWeb.Feeds do
   def handle_event("validate", %{"feed" => feed}, socket) do
     changeset =
       feed
-      |> LiveRSS.Feed.changeset()
-      # forces validation to show
+      |> Feed.changeset()
+      # forces validation to show on change
       # see https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#module-a-note-on-errors
       |> Map.put(:action, :insert)
 
@@ -55,9 +57,8 @@ defmodule LiveRSSWeb.Feeds do
   end
 
   def handle_event("delete", %{"value" => id}, socket) do
-    LiveRSS.Feed
-    |> LiveRSS.Repo.get(id)
-    |> LiveRSS.Repo.delete()
+    id
+    |> Feeds.delete_feed()
     |> case do
       {:ok, _feed} ->
         feeds = load_feeds()
@@ -117,10 +118,10 @@ defmodule LiveRSSWeb.Feeds do
   end
 
   defp new_feed_changeset do
-    LiveRSS.Feed.changeset(%{})
+    Feed.changeset(%{})
   end
 
   defp load_feeds do
-    LiveRSS.Feed |> LiveRSS.Repo.all()
+    Feeds.list_feeds()
   end
 end
