@@ -19,7 +19,10 @@ defmodule LiveRSS.MixProject do
   def application do
     [
       mod: {LiveRSS.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools],
+      start_phases: [
+        start_feed_monitors: []
+      ]
     ]
   end
 

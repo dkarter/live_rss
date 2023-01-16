@@ -8,14 +8,14 @@ defmodule LiveRSS.FeedMonitorSupervisor do
   alias LiveRSS.Feeds.Feed
   alias LiveRSS.FeedMonitor
 
+  require Logger
+
   def start_link(_arg) do
     DynamicSupervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   @impl DynamicSupervisor
   def init([]) do
-    # TODO: how can I have this boot up with all the feeds in the database when the
-    # app starts?
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 

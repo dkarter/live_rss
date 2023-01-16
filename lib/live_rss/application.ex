@@ -5,7 +5,9 @@ defmodule LiveRSS.Application do
 
   use Application
 
-  @impl true
+  require Logger
+
+  @impl Application
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
@@ -30,9 +32,19 @@ defmodule LiveRSS.Application do
     Supervisor.start_link(children, opts)
   end
 
+  @impl Application
+  def start_phase(:start_feed_monitors, _phase_type, []) do
+    Logger.info("Start phase: :start_feed_monitors")
+
+    LiveRSS.list_feeds()
+    |> Enum.each(&LiveRSS.start_feed_monitor/1)
+
+    :ok
+  end
+
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
-  @impl true
+  @impl Application
   def config_change(changed, _new, removed) do
     LiveRSSWeb.Endpoint.config_change(changed, removed)
     :ok
