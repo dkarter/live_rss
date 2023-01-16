@@ -3,7 +3,7 @@ defmodule LiveRSSWeb.Feeds do
 
   def mount(_params, _session, socket) do
     changeset = new_feed_changeset()
-    feeds = LiveRSS.Feed |> LiveRSS.Repo.all()
+    feeds = load_feeds()
 
     socket =
       socket
@@ -19,7 +19,7 @@ defmodule LiveRSSWeb.Feeds do
     |> LiveRSS.Repo.insert()
     |> case do
       {:ok, _feed} ->
-        feeds = LiveRSS.Feed |> LiveRSS.Repo.all()
+        feeds = load_feeds()
 
         socket =
           socket
@@ -60,7 +60,7 @@ defmodule LiveRSSWeb.Feeds do
     |> LiveRSS.Repo.delete()
     |> case do
       {:ok, _feed} ->
-        feeds = LiveRSS.Feed |> LiveRSS.Repo.all()
+        feeds = load_feeds()
 
         socket =
           socket
@@ -81,15 +81,28 @@ defmodule LiveRSSWeb.Feeds do
   def render(assigns) do
     ~H"""
     <div>
-      <.simple_form :let={f} for={@changeset} phx-change="validate" phx-submit="save">
-        <.input field={{f, :name}} label="Name" />
-        <.input field={{f, :url}} label="URL" />
+      <h2 class="text-lg font-semibold mb-3">Add Feed</h2>
+      <.simple_form
+        :let={f}
+        for={@changeset}
+        phx-change="validate"
+        phx-submit="save"
+        class="[&>div]:mt-0"
+      >
+        <div class="md:flex md:space-x-4 md:[&>div:last-child]:grow">
+          <.input field={{f, :name}} label="Name" />
+          <.input field={{f, :url}} label="URL" />
+        </div>
         <:actions>
           <.button>Save</.button>
         </:actions>
       </.simple_form>
 
-      <.table id="feeds" rows={@feeds}>
+      <h2 class="text-lg font-semibold mt-8 mb-3">Feeds</h2>
+
+      <p :if={length(@feeds) == 0} class="italic">No feeds found, add one now!</p>
+
+      <.table :if={length(@feeds) > 0} id="feeds" rows={@feeds}>
         <:col :let={feed} label="id"><%= feed.id %></:col>
         <:col :let={feed} label="name"><%= feed.name %></:col>
         <:col :let={feed} label="url"><%= feed.url %></:col>
@@ -103,5 +116,9 @@ defmodule LiveRSSWeb.Feeds do
 
   defp new_feed_changeset do
     LiveRSS.Feed.changeset(%{})
+  end
+
+  defp load_feeds do
+    LiveRSS.Feed |> LiveRSS.Repo.all()
   end
 end
