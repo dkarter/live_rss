@@ -1,18 +1,46 @@
 # LiveRSS
 
+A lightweight, self-hosted RSS Reader.
+Runs on a single container and uses SQLite3 as the database.
+
+> THIS IS STILL A WIP!
+
 To start your Phoenix server:
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+- Run `mix setup` to install and setup dependencies
+- Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+# Running with Docker
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+First build an image:
 
-## Learn more
+```bash
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+```
+
+Then create a local database file:
+
+```bash
+touch prod.db
+```
+
+Map the database to your local file and run migration:
+
+```bash
+docker run -it \
+  -e DATABASE_PATH=/app/prod.db \
+  -e SECRET_KEY_BASE=$(mix phx.gen.secret) \
+  -v $(pwd)/prod.db:/app/prod.db \
+  live_rss bin/migrate
+```
+
+Run the server:
+
+```bash
+docker run -it -d \
+  -p 4000:4000 \
+  -e DATABASE_PATH=/app/prod.db \
+  -e SECRET_KEY_BASE=$(mix phx.gen.secret) \
+  -v $(pwd)/prod.db:/app/prod.db \
+  live_rss
+```
