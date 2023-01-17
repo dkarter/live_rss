@@ -51,7 +51,9 @@ defmodule LiveRSS.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:req, "~> 0.3"}
+      {:req, "~> 0.3"},
+      {:sweet_xml, "~> 0.7"},
+      {:timex, "~> 3.7"}
     ]
   end
 
