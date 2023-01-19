@@ -1,4 +1,4 @@
-defmodule LiveRSSWeb.Feeds do
+defmodule LiveRSSWeb.ManageFeeds do
   use LiveRSSWeb, :live_view
 
   alias LiveRSS.Feeds.Feed
