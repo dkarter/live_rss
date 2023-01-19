@@ -1,6 +1,8 @@
 defmodule LiveRSSWeb.Feeds do
   use LiveRSSWeb, :live_view
 
+  alias LiveRSS.Feeds.Feed
+
   def mount(_params, _session, socket) do
     changeset = new_feed_changeset()
     feeds = load_feeds()
@@ -15,8 +17,7 @@ defmodule LiveRSSWeb.Feeds do
 
   def handle_event("save", %{"feed" => feed}, socket) do
     feed
-    |> LiveRSS.Feed.changeset()
-    |> LiveRSS.Repo.insert()
+    |> LiveRSS.create_feed()
     |> case do
       {:ok, _feed} ->
         feeds = load_feeds()
@@ -42,8 +43,8 @@ defmodule LiveRSSWeb.Feeds do
   def handle_event("validate", %{"feed" => feed}, socket) do
     changeset =
       feed
-      |> LiveRSS.Feed.changeset()
-      # forces validation to show
+      |> Feed.changeset()
+      # forces validation to show on change
       # see https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#module-a-note-on-errors
       |> Map.put(:action, :insert)
 
@@ -55,9 +56,8 @@ defmodule LiveRSSWeb.Feeds do
   end
 
   def handle_event("delete", %{"value" => id}, socket) do
-    LiveRSS.Feed
-    |> LiveRSS.Repo.get(id)
-    |> LiveRSS.Repo.delete()
+    id
+    |> LiveRSS.delete_feed()
     |> case do
       {:ok, _feed} ->
         feeds = load_feeds()
@@ -76,6 +76,25 @@ defmodule LiveRSSWeb.Feeds do
 
         {:noreply, socket}
     end
+  end
+
+  def handle_event("start_monitor", %{"value" => id}, socket) do
+    id
+    |> LiveRSS.get_feed()
+    |> LiveRSS.start_feed_monitor()
+
+    socket = assign(socket, :feeds, load_feeds())
+
+    {:noreply, socket}
+  end
+
+  def handle_event("stop_monitor", %{"value" => id}, socket) do
+    id
+    |> LiveRSS.stop_feed_monitor()
+
+    socket = assign(socket, :feeds, load_feeds())
+
+    {:noreply, socket}
   end
 
   def render(assigns) do
@@ -107,6 +126,24 @@ defmodule LiveRSSWeb.Feeds do
         <:col :let={feed} label="name"><%= feed.name %></:col>
         <:col :let={feed} label="url"><%= feed.url %></:col>
         <:col :let={feed} label="actions">
+          <.button
+            :if={!feed.is_running}
+            value={feed.id}
+            phx-click="start_monitor"
+            alt="start monitoring"
+            class="bg-transparent"
+          >
+            <Heroicons.play mini class="mt-0.5 h-5 w-5 flex-none fill-blue-500" />
+          </.button>
+          <.button
+            :if={feed.is_running}
+            value={feed.id}
+            phx-click="stop_monitor"
+            alt="stop monitoring"
+            class="bg-transparent"
+          >
+            <Heroicons.stop mini class="mt-0.5 h-5 w-5 flex-none fill-purple-500" />
+          </.button>
           <.button value={feed.id} phx-click="delete" alt="delete feed" class="bg-transparent">
             <Heroicons.trash mini class="mt-0.5 h-5 w-5 flex-none fill-rose-500" />
           </.button>
@@ -117,10 +154,13 @@ defmodule LiveRSSWeb.Feeds do
   end
 
   defp new_feed_changeset do
-    LiveRSS.Feed.changeset(%{})
+    Feed.changeset(%{})
   end
 
   defp load_feeds do
-    LiveRSS.Feed |> LiveRSS.Repo.all()
+    LiveRSS.list_feeds()
+    |> Enum.map(fn feed ->
+      Map.put(feed, :is_running, LiveRSS.is_feed_monitor_running?(feed.id))
+    end)
   end
 end

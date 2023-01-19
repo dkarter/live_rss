@@ -1,6 +1,12 @@
-defmodule LiveRSS.Feed do
+defmodule LiveRSS.Feeds.Feed do
   use Ecto.Schema
   import Ecto.Changeset
+
+  # @type t :: %__MODULjE__{
+  #     __meta__: Ecto.Schema.me
+  #     name: binary(),
+  #     url: binary(),
+  #   }
 
   schema "feeds" do
     field :name, :string

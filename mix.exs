@@ -19,7 +19,10 @@ defmodule LiveRSS.MixProject do
   def application do
     [
       mod: {LiveRSS.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools],
+      start_phases: [
+        start_feed_monitors: []
+      ]
     ]
   end
 
@@ -47,7 +50,10 @@ defmodule LiveRSS.MixProject do
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+      {:req, "~> 0.3"},
+      {:sweet_xml, "~> 0.7"},
+      {:timex, "~> 3.7"}
     ]
   end
 
